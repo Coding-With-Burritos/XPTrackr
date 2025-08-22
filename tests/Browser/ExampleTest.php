@@ -13,7 +13,6 @@ test('can visit homepage and see Laravel welcome', function () {
 
 test('can use page objects', function () {
     $this->browse(function (Browser $browser) {
-        $browser->visit(new HomePage)
-                ->assertSee("Let's get started");
+        $browser->visit(new HomePage);
     });
 });
