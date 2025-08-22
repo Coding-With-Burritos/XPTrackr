@@ -33,6 +33,16 @@ jobs:
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
+    - name: Configure .env for CI
+      run: |
+        echo "APP_NAME=XPTrackr" >> .env
+        echo "DB_CONNECTION=mysql" >> .env
+        echo "DB_HOST=127.0.0.1" >> .env
+        echo "DB_PORT=3306" >> .env
+        echo "DB_DATABASE=xptrackr_test" >> .env
+        echo "DB_USERNAME=root" >> .env
+        echo "DB_PASSWORD=" >> .env
+
     - name: Install Dependencies
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
@@ -74,6 +84,7 @@ jobs:
     - name: Create Dusk environment file
       run: |
         cp .env .env.dusk.local
+        echo "APP_NAME=XPTrackr" >> .env.dusk.local
         echo "APP_URL=http://127.0.0.1:8000" >> .env.dusk.local
         echo "DB_CONNECTION=mysql" >> .env.dusk.local
         echo "DB_HOST=127.0.0.1" >> .env.dusk.local
