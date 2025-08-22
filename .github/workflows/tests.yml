@@ -67,6 +67,9 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y google-chrome-stable
 
+    - name: Install ChromeDriver for Dusk
+      run: php artisan dusk:chrome-driver --detect
+
     - name: Start Laravel development server
       run: php artisan serve --host=127.0.0.1 --port=8000 &
       env:
