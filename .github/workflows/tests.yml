@@ -2,7 +2,7 @@ name: Tests
 
 on:
   push:
-    branches: [ "*" ]
+    branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main", "develop" ]
 
@@ -33,6 +33,16 @@ jobs:
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
+    - name: Configure .env for CI
+      run: |
+        echo "APP_NAME=XPTrackr" >> .env
+        echo "DB_CONNECTION=mysql" >> .env
+        echo "DB_HOST=127.0.0.1" >> .env
+        echo "DB_PORT=3306" >> .env
+        echo "DB_DATABASE=xptrackr_test" >> .env
+        echo "DB_USERNAME=root" >> .env
+        echo "DB_PASSWORD=" >> .env
+
     - name: Install Dependencies
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
@@ -62,3 +72,49 @@ jobs:
         DB_USERNAME: root
         DB_PASSWORD: 
       run: ./vendor/bin/pest
+
+    - name: Install Chrome for Dusk
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+
+    - name: Install ChromeDriver for Dusk
+      run: php artisan dusk:chrome-driver --detect
+
+    - name: Create Dusk environment file
+      run: |
+        cp .env .env.dusk.local
+        echo "APP_NAME=XPTrackr" >> .env.dusk.local
+        echo "APP_URL=http://127.0.0.1:8000" >> .env.dusk.local
+        echo "DB_CONNECTION=mysql" >> .env.dusk.local
+        echo "DB_HOST=127.0.0.1" >> .env.dusk.local
+        echo "DB_PORT=3306" >> .env.dusk.local
+        echo "DB_DATABASE=xptrackr_test" >> .env.dusk.local
+        echo "DB_USERNAME=root" >> .env.dusk.local
+        echo "DB_PASSWORD=" >> .env.dusk.local
+
+    - name: Start Laravel development server
+      run: php artisan serve --host=127.0.0.1 --port=8000 &
+      env:
+        DB_CONNECTION: mysql
+        DB_HOST: 127.0.0.1
+        DB_PORT: 3306
+        DB_DATABASE: xptrackr_test
+        DB_USERNAME: root
+        DB_PASSWORD: 
+
+    - name: Wait for server
+      run: |
+        sleep 5
+        curl -f http://127.0.0.1:8000 || (echo "Server not ready, waiting more..." && sleep 5 && curl -f http://127.0.0.1:8000)
+
+    - name: Execute Dusk tests
+      env:
+        DB_CONNECTION: mysql
+        DB_HOST: 127.0.0.1
+        DB_PORT: 3306
+        DB_DATABASE: xptrackr_test
+        DB_USERNAME: root
+        DB_PASSWORD: 
+        APP_URL: http://127.0.0.1:8000
+      run: php artisan dusk
