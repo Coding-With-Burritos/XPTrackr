@@ -104,7 +104,9 @@ jobs:
         DB_PASSWORD: 
 
     - name: Wait for server
-      run: sleep 3
+      run: |
+        sleep 5
+        curl -f http://127.0.0.1:8000 || (echo "Server not ready, waiting more..." && sleep 5 && curl -f http://127.0.0.1:8000)
 
     - name: Execute Dusk tests
       env:
