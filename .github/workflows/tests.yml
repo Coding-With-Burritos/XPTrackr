@@ -71,6 +71,11 @@ jobs:
     - name: Install ChromeDriver for Dusk
       run: php artisan dusk:chrome-driver --detect
 
+    - name: Create Dusk environment file
+      run: |
+        cp .env .env.dusk.local
+        echo "APP_URL=http://127.0.0.1:8000" >> .env.dusk.local
+
     - name: Start Laravel development server
       run: php artisan serve --host=127.0.0.1 --port=8000 &
       env:
