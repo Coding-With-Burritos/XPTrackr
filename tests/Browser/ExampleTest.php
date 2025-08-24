@@ -3,11 +3,12 @@
 use Laravel\Dusk\Browser;
 use Tests\Browser\Pages\HomePage;
 
-test('can visit homepage and see Laravel welcome', function () {
+test('can visit homepage and see welcome message', function () {
     $this->browse(function (Browser $browser) {
         $browser->visit('/')
-                ->assertSee("Let's get started")
-                ->assertTitle('XPTrackr');
+                ->assertSee('Welcome to XPTrackr')
+                ->assertSee('Track your habits and level up!')
+                ->assertTitle('Welcome - XPTrackr');
     });
 });
 

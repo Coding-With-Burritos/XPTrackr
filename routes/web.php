@@ -2,15 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Home route - guests see welcome, authenticated users redirect to dashboard
-Route::get('/', function () {
-    if (auth()->check()) {
-        return redirect('/dashboard');
-    }
-    return view('welcome');
+Route::middleware('guest')->group(function () {
+    Route::get('/', function () {
+        return view('welcome');
+    })->name('home');
 });
 
-// Dashboard route - authenticated users only
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware('auth');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    });
+});
